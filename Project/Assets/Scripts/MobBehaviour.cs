@@ -16,9 +16,9 @@ public class MobBehaviour : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
     }
-    public virtual void GetDamage(float dmg)
+    public void GetDamage(float damage)
     {
-        hp -= dmg;
+        hp -= damage;
         if (hp <= 0)
             Destroy(gameObject);
     }

@@ -14,16 +14,16 @@ public class PlayerScript : MobBehaviour
     private Vector3 direction;
     private Transform shootPoint;
     private Transform spriteTransform;
-    private Transform visionTransform;
 
     private bool isMovingUp;
     private bool isMovingLeft;
     private bool isMovingRigth;
     private bool isMovingDown;
+
+    private float damage = 40f;
     private void Start()
     {
         audio = GetComponent<AudioSource>();
-        visionTransform = transform.Find("VisionObject").transform;
         spriteTransform = transform.Find("Sprite").transform;
         shootPoint = transform.Find("Sprite/ShootPoint").transform;
         mobBehaviour = GetComponent<MobBehaviour>();
@@ -37,9 +37,9 @@ public class PlayerScript : MobBehaviour
     }
     private void Movement()
     {
-        if(Input.GetKey(KeyCode.W) && isMovingUp)
+        if (Input.GetKey(KeyCode.W) && isMovingUp)
         {
-            transform.position = new Vector3(transform.position.x, 
+            transform.position = new Vector3(transform.position.x,
                                              transform.position.y + speed * Time.deltaTime, 0);
         }
         if (Input.GetKey(KeyCode.A) && isMovingLeft)
@@ -47,12 +47,12 @@ public class PlayerScript : MobBehaviour
             transform.position = new Vector3(transform.position.x - speed * Time.deltaTime,
                                              transform.position.y, 0);
         }
-        if(Input.GetKey(KeyCode.D) && isMovingRigth)
+        if (Input.GetKey(KeyCode.D) && isMovingRigth)
         {
             transform.position = new Vector3(transform.position.x + speed * Time.deltaTime,
                                              transform.position.y, 0);
         }
-        if(Input.GetKey(KeyCode.S) && isMovingDown)
+        if (Input.GetKey(KeyCode.S) && isMovingDown)
         {
             transform.position = new Vector3(transform.position.x,
                                              transform.position.y - speed * Time.deltaTime, 0);
@@ -62,11 +62,11 @@ public class PlayerScript : MobBehaviour
             GetDamage(20);
             print(hp);
         }
-            
+
     }
     private void LookAtMouse()
     {
-        direction = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
+        direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         spriteTransform.rotation = Quaternion.AngleAxis(angle + 270, Vector3.forward);
     }
@@ -81,14 +81,15 @@ public class PlayerScript : MobBehaviour
             {
                 if (raycastHit.collider.gameObject.tag == "Enemy")
                 {
-                    Destroy(raycastHit.collider.gameObject);
+                    MobBehaviour mob = raycastHit.collider.gameObject.GetComponent<MobBehaviour>();
+                    mob.GetDamage(damage);
                 }
             }
             Debug.DrawRay(shootPoint.position, direction, Color.red);
         }
     }
     private void ObstacleCheck()
-    {  
+    {
         RaycastHit2D raycastHitUp = Physics2D.Raycast(transform.position, transform.up, 0.2f, layerMask);
         RaycastHit2D raycastHitLeft = Physics2D.Raycast(transform.position, -transform.right, 0.2f, layerMask);
         RaycastHit2D raycastHitRigth = Physics2D.Raycast(transform.position, transform.right, 0.2f, layerMask);
@@ -122,15 +123,5 @@ public class PlayerScript : MobBehaviour
         }
         else
             isMovingDown = false;
-    }
-    private void Vision()
-    {
-        float rotationSpeed = 0.1f;
-        visionTransform.Rotate(0, 0, rotationSpeed, Space.Self);
-        RaycastHit2D raycastHit = Physics2D.Raycast(visionTransform.up, direction);
-        if (raycastHit.collider != null)
-        {
-            Debug.DrawRay(raycastHit.point, direction, Color.black, Mathf.Infinity);
-        }
     }
 }
