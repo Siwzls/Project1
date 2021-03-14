@@ -7,13 +7,13 @@ public class PlayerScript : MobBehaviour
     private new AudioSource audio;
     [SerializeField]
     private AudioClip shotSound;
-    [SerializeField]
-    private LayerMask layerMask;
 
     private MobBehaviour mobBehaviour;
-    private Vector3 direction;
     private Transform shootPoint;
     private Transform spriteTransform;
+    private Vector3 direction;
+    [SerializeField]
+    private LayerMask layerMask;
 
     private bool isMovingUp;
     private bool isMovingLeft;
@@ -28,12 +28,15 @@ public class PlayerScript : MobBehaviour
         shootPoint = transform.Find("Sprite/ShootPoint").transform;
         mobBehaviour = GetComponent<MobBehaviour>();
     }
-    void Update()
-    {
-        ObstacleCheck();
+    private void Update()
+    { 
         Shoot();
         LookAtMouse();
         Movement();
+    }
+    private void FixedUpdate()
+    {
+        ObstacleCheck();
     }
     private void Movement()
     {
@@ -67,7 +70,7 @@ public class PlayerScript : MobBehaviour
     private void LookAtMouse()
     {
         direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         spriteTransform.rotation = Quaternion.AngleAxis(angle + 270, Vector3.forward);
     }
     private void Shoot()
